@@ -100,7 +100,7 @@
       100% { transform: translate(0px, 0) }
     }
   </style>
-
+    
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -260,7 +260,7 @@
         session.addEventListener('selectend', onSelectEnd);
         // By listening for the 'select' event we can find out when the user has
         // performed some sort of primary input action and respond to it.
-
+        
 
         session.addEventListener('squeezestart', onSqueezeStart);
         session.addEventListener('squeezeend', onSqueezeEnd);
@@ -312,6 +312,18 @@
           }
         }
 
+        if(!hitResult){
+        let session = ev.frame.session;
+        let refSpace = session.isImmersive ?
+                         xrImmersiveRefSpace :
+                         inlineViewerHelper.referenceSpace;
+        for (let inputSource of ev.frame.session.inputSources) {
+        let targetRayPose = ev.frame.getPose(inputSource.targetRaySpace, refSpace);
+        let targetRay = new Ray(targetRayPose.transform.matrix);
+            addBox(targetRay.origin[0], targetRay.origin[1], targetRay.origin[2] - 0. 5, 127, 0, 255 );
+            }
+        }
+
         onSelect(ev);
 
       }
@@ -319,7 +331,7 @@
       //Called when "select button" is de-pressed in the WebXR emulator. Resets the box's size to its original size.
       function onSelectEnd(ev) {
         let i = (ev.inputSource.handedness == "left") ? 0 : 1;
-        let currently_selected_box = currently_selected_boxes[i];
+        let currently_selected_box = currently_selected_boxes[i];  
         console.log("selectend " + currently_selected_box);
         if (currently_selected_box != null) {
           if (currently_selected_box.selected) {
@@ -335,10 +347,11 @@
         }
       }
 
+
       //Part of onSelectStart. Shrinks the box's size and changes it to a random color.
       function onSelect(ev) {
         let i = (ev.inputSource.handedness == "left") ? 0 : 1;
-        let currently_selected_box = currently_selected_boxes[i];
+        let currently_selected_box = currently_selected_boxes[i];  
         console.log("select " + currently_selected_box);
         if (currently_selected_box != null) {
           // Change the box color to something random.
@@ -380,12 +393,12 @@
       //Called when "squeeze button" is de-pressed in the WebXR emulator. Returns the box to its original position.
       function onSqueezeEnd(ev) {
         let i = (ev.inputSource.handedness == "left") ? 0 : 1;
-        let currently_grabbed_box = currently_grabbed_boxes[i];
+        let currently_grabbed_box = currently_grabbed_boxes[i];  
         console.log("squeezeend " + currently_grabbed_box);
         if (currently_grabbed_box != null && currently_grabbed_box.grabbed) {
           // the scale of 'grabbed' box is 0.1. Restore the original scale.
           vec3.add(currently_grabbed_box.scale, currently_grabbed_box.scale, [0.25, 0.25, 0.25]);
-          //currently_grabbed_box.position = currently_grabbed_box.originalPos;
+         // currently_grabbed_box.position = currently_grabbed_box.originalPos;
           currently_grabbed_box.grabbed = false;
           currently_grabbed_boxes[i] = null;
         }
@@ -394,7 +407,7 @@
       //Part of onSqueezeStart. Changes the color of the box to a random color.
       function onSqueeze(ev) {
         let i = (ev.inputSource.handedness == "left") ? 0 : 1;
-        let currently_grabbed_box = currently_grabbed_boxes[i];
+        let currently_grabbed_box = currently_grabbed_boxes[i];  
         console.log("squeeze " + currently_grabbed_box);
         if (currently_grabbed_box != null && currently_grabbed_box.grabbed) {
           // Change the box color to something random, so we can see that 'squeeze' was invoked.
@@ -482,6 +495,6 @@
       // Start the XR application.
       initXR();
     </script>
-
+  
 
 <canvas width="984" height="981" style="cursor: grab;"></canvas></body></html>
